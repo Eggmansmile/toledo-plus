@@ -661,6 +661,28 @@
             "type": "UI"
           }
         ]
+      },
+      {
+        "id": "_5020_1",
+        "title": "Lecture02 2026-10-14 14:00",
+        "created": "@iso:-3d",
+        "modified": "@iso:-3d",
+        "position": 0,
+        "hasChildren": false,
+        "availability": {
+          "available": "Yes"
+        },
+        "contentHandler": {
+          "id": "resource/x-bb-blti-link",
+          "url": "https://kaltura-kaf.edu.kuleuven.cloud/browseandembed/index/media/entryid/1_mockentry/showDescription/false/playerSize/960x540/"
+        },
+        "links": [
+          {
+            "href": "/ultra/redirect?redirectType=nautilus&courseId=_900661_1&contentId=_5020_1",
+            "rel": "alternate",
+            "type": "UI"
+          }
+        ]
       }
     ],
     "_900662_1": [

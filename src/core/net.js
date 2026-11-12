@@ -179,7 +179,7 @@
     const abs = resolve(url);
     const method = String(opts.method || 'GET').toUpperCase();
     const headers = Object.assign({}, opts.headers || {});
-    if (originOf(abs) === here()) {
+    if (originOf(abs) === here() && !opts.relay) { // opts.relay: force the background relay (follows redirects across origins)
       const { r, timer } = await direct(abs, { method, headers, credentials: 'include' });
       try {
         if (r.status === 401 || r.status === 403) throw fail(`${method} ${abs}: ${r.status} (session)`, r.status, { url: abs, auth: true });
@@ -187,7 +187,7 @@
         return await r.text();
       } finally { clearTimeout(timer); }
     }
-    const reply = await relay({ type: 'tp-fetch', url: abs, method, headers, as: 'text' });
+    const reply = await relay({ type: 'tp-fetch', url: abs, method, headers, as: 'text', body: opts.body });
     if (reply.error === 'redirected' || reply.status === 401 || reply.status === 403) throw fail(`${method} ${abs}: session`, reply.status || 0, { url: abs, relay: true, auth: true });
     if (!reply.ok) throw fail(`${method} ${abs}: ${reply.status || reply.error || 'relay failed'}`, reply.status || 0, { url: abs, relay: true });
     return reply.data;

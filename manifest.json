@@ -21,7 +21,10 @@
     "https://webwsp.aps.kuleuven.be/*",
     "https://cloud.timeedit.net/*",
     "https://api.toledoplus.be/*",
-    "https://icts-p-toledo-valvas.cloud.icts.kuleuven.be/*"
+    "https://icts-p-toledo-valvas.cloud.icts.kuleuven.be/*",
+    "https://kaltura-kaf.edu.kuleuven.cloud/*",
+    "https://developer.blackboard.com/*",
+    "https://cdnapisec.kaltura.com/*"
   ],
   "declarative_net_request": {
     "rule_resources": [
@@ -59,6 +62,7 @@
         "src/core/net.js",
         "src/core/data.js",
         "src/core/kuloket.js",
+        "src/core/kaltura.js",
         "src/core/telemetry.js",
         "src/core/index.js",
         "src/core/fulltext-engine.js",
@@ -107,6 +111,7 @@
         "src/core/net.js",
         "src/core/data.js",
         "src/core/kuloket.js",
+        "src/core/kaltura.js",
         "src/core/telemetry.js",
         "src/core/index.js",
         "src/core/fulltext-engine.js",
