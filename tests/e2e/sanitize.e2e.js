@@ -94,6 +94,15 @@ describe('TP.util.sanitize', () => {
     assert.match(own, /href="https:\/\/icts-p-toledo-valvas\.cloud\.icts\.kuleuven\.be\/a"/);
   });
 
+  it('empty Ultra file blocks get their file name as link text, as text only', async () => {
+    const f = (o) => JSON.stringify(o).replace(/"/g, '&quot;');
+    const out = await page.evaluate((h) => window.TP.util.sanitize(h),
+      `<a data-bbfile="${f({ displayName: 'Slides 1.pdf' })}" href="/bbcswebdav/pid-1/xid-1"></a><a data-bbfile="${f({ displayName: '<img src=x onerror=window.__x=1>' })}" href="/b"></a><a data-bbfile="nojson" href="/c"></a>`);
+    assert.match(out, /<a href="https:\/\/ultra\.edu\.kuleuven\.cloud\/bbcswebdav\/pid-1\/xid-1"[^>]*>Slides 1\.pdf<\/a>/);
+    assert.match(out, /&lt;img/, 'a display name is text, never markup');
+    assert.doesNotMatch(out, /data-bbfile/);
+  });
+
   it('plain() returns text only', async () => {
     const t = await page.evaluate(() => window.TP.util.plain('<p>Hallo <b>wereld</b></p><script>x</script>'));
     assert.match(t, /Hallo wereld/);
