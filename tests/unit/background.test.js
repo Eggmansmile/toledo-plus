@@ -168,6 +168,11 @@ test('Ad Valvas: GET of one message page only (path + "?continue"), cookies incl
   // No valvas session: the page bounces to the KU Leuven IdP (SAML) → 'redirected'; landing on another valvas page → 'redirected' too.
   const idp = load(async () => res('<form><input name="SAMLRequest"></form>', { type: 'text/html', url: 'https://idp.kuleuven.be/idp/profile/SAML2/Redirect/SSO?execution=e1s1' }));
   assert.equal((await idp.send(msg(V + '/student/messages/2/external', { as: 'text' }))).error, 'redirected');
+  // Edge/Chrome: the cross-origin IdP hop makes fetch itself throw (CORS) → also "signed out", not a generic error (issue #49).
+  const cors = load(async () => { throw new TypeError('Failed to fetch'); });
+  assert.equal((await cors.send(msg(V + '/student/messages/2/external', { as: 'text' }))).error, 'redirected');
+  const tol = load(async () => { throw new TypeError('Failed to fetch'); });
+  assert.equal((await tol.send(msg('https://toledo.kuleuven.be/portal/api/events'))).error, 'Failed to fetch');
   const home = load(async () => res('<html>home</html>', { type: 'text/html', url: V + '/student/login' }));
   assert.equal((await home.send(msg(V + '/student/messages/2/external', { as: 'text' }))).error, 'redirected');
 });

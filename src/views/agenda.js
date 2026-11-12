@@ -807,7 +807,7 @@ ${src ? `<p class="ag-pop-src">${esc(t('agenda.pop.source.' + src))}${l.source =
   const KEYS = [
     ['T', 'agenda.keys.today'], ['D', 'agenda.keys.day'], ['W', 'agenda.keys.week'], ['M', 'agenda.keys.month'], ['A / L', 'agenda.keys.list'],
     ['J · N · →', 'agenda.keys.next'], ['K · P · ←', 'agenda.keys.prev'], ['G', 'agenda.keys.goto'],
-    ['↑ ↓ ← →', 'agenda.keys.move'], ['↵', 'agenda.keys.open'], ['Esc', 'agenda.keys.close'], ['?', 'agenda.keys.help'],
+    ['G O V D A M K S', 'agenda.keys.nav'], ['↑ ↓ ← →', 'agenda.keys.move'], ['↵', 'agenda.keys.open'], ['Esc', 'agenda.keys.close'], ['?', 'agenda.keys.help'],
   ];
   function openKeys(opener) {
     const mod = (TP.shell && TP.shell.mod) || 'Ctrl ';

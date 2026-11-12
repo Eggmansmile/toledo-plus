@@ -99,6 +99,9 @@ async function tpRelay(msg) {
     }
     return { ok: r.ok, status: r.status, data, retryAfter };
   } catch (e) {
+    // Ad Valvas without a session: the redirect chain ends at the IdP, which a fetch cannot read (CORS) → it throws instead of
+    // returning r.url. That is "signed out", not a failure (issue #49).
+    if (!ctrl.signal.aborted && tpOrigin(url) === TP_VALVAS && (e && e.name === 'TypeError')) return { ok: false, status: 0, data: null, error: 'redirected' };
     return { ok: false, status: 0, data: null, error: ctrl.signal.aborted ? 'timeout' : String((e && e.message) || e) };
   } finally {
     clearTimeout(timer);
