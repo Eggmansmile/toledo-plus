@@ -7,6 +7,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ## [Unreleased]
 
 ### Fixed
+- Vakinhoud: files placed as blocks in an Ultra page (e.g. "Handouts") were empty, invisible links; they now show their file name and open the file.
 - Agenda: the week grid starts at the hour the agenda picks (an hour before your first lesson, or around now) again. It was scrolled before your lessons were in and then kept the hour of an empty week.
 
 ### Changed

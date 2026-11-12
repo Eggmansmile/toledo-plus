@@ -40,6 +40,11 @@
     const base = (opts && opts.base) || ULTRA_BASE;
     const doc = new DOMParser().parseFromString(String(html), 'text/html');
     doc.querySelectorAll(DROP).forEach((n) => n.remove());
+    // Ultra file blocks are empty <a data-bbfile='{"displayName":…}' href="…bbcswebdav…">: give them their file name as text.
+    doc.querySelectorAll('a[data-bbfile]').forEach((el) => {
+      if (el.textContent.trim()) return;
+      try { const f = JSON.parse(el.getAttribute('data-bbfile')); el.textContent = f.displayName || f.linkName || ''; } catch (_) { /* keep empty */ }
+    });
     doc.querySelectorAll('*').forEach((el) => {
       for (const a of [...el.attributes]) {
         const n = a.name.toLowerCase();
