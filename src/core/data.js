@@ -645,7 +645,10 @@
   }
 
   /** Semester from the cached KU Loket timetable (no requests): lessons only Sep–Jan → SEMESTER1, only Feb–Jun → SEMESTER2, both → YEAR. */
+  let inKul = false; // peekLessons → kuloket matcher → TP.data.courses() → here again: break that cycle
   function kuloketSemester(name, codes, year, memo = {}) {
+    if (inKul) return '';
+    inKul = true;
     try {
       const kl = TP.kuloket;
       const y = Math.floor((Number(year) || 0) / 100);
@@ -659,7 +662,7 @@
         if (m >= 8 || m === 0) s1 = true; else if (m >= 1 && m <= 5) s2 = true;
       }
       return s1 && s2 ? 'YEAR' : s1 ? 'SEMESTER1' : s2 ? 'SEMESTER2' : '';
-    } catch (_) { return ''; }
+    } catch (_) { return ''; } finally { inKul = false; }
   }
 
   function maxYear(list) {
