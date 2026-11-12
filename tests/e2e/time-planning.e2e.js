@@ -75,6 +75,24 @@ describe('exams as first-class items, export, own deadlines (desktop)', () => {
     assert.equal((ics2.match(/BEGIN:VEVENT/g) || []).length, n, 'Agenda exports the same set');
   });
 
+  it('F6: deadline sheet shows the sanitized assignment text, attachments and the Ultra link', async () => {
+    await openPortal(h, 'deadlines');
+    await page.locator(`${ROOT} .va-dl`, { hasText: "Opdracht 'Onder de huid'" }).first().locator('.va-dl-open').click();
+    await sheetSettled(page);
+    await dialog(page).locator('.tp-detail-desc').waitFor({ timeout: 4000 });
+    assert.match(await dialog(page).innerText(), /twee pagina's/);
+    assert.equal(await page.evaluate(() => globalThis.__tplusXss || 0), 0, 'handlers stripped');
+    const att = dialog(page).locator('[data-detail-action^="att:"]');
+    assert.equal(await att.count(), 1);
+    assert.match(await att.innerText(), /opdracht_onder_de_huid\.pdf/);
+    assert.match(await dialog(page).locator('a[href*="/ultra/redirect"]').first().getAttribute('href'), /^https:\/\/ultra\./, 'absolute Ultra link');
+    // on the portal there is no same-origin blob download: the file opens in a new tab (ultraDownload → 'opened')
+    const [tab] = await Promise.all([page.context().waitForEvent('page', { timeout: 6000 }), att.click()]);
+    assert.match(tab.url(), /opdracht_onder_de_huid\.pdf/);
+    await tab.close();
+    await page.keyboard.press('Escape');
+  });
+
   it('own deadline: add, edit it in the sheet, delete it and Undo (TP-207, TP-208)', async () => {
     await openPortal(h, 'deadlines');
     await page.locator(`${ROOT} [data-dl-add] summary`).click();

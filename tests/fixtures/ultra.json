@@ -569,6 +569,35 @@
         ]
       },
       {
+        "id": "_9007_1",
+        "title": "Opdracht 'Onder de huid'",
+        "created": "@iso:-2d",
+        "modified": "@iso:-2d",
+        "position": 0,
+        "hasChildren": false,
+        "availability": {
+          "available": "Yes"
+        },
+        "contentHandler": {
+          "id": "resource/x-bb-asmt-test-link"
+        },
+        "body": "<p>Schrijf <strong>twee pagina's</strong> over huidtextuur in film.</p><img src=x onerror=\"window.__tplusXss=1\">",
+        "_attachments": [
+          {
+            "id": "_att_9007_1",
+            "fileName": "opdracht_onder_de_huid.pdf",
+            "mimeType": "application/pdf"
+          }
+        ],
+        "links": [
+          {
+            "href": "/ultra/redirect?redirectType=nautilus&courseId=_900661_1&contentId=_9007_1",
+            "rel": "alternate",
+            "type": "UI"
+          }
+        ]
+      },
+      {
         "id": "_5017_1",
         "title": "Leeswijzer",
         "created": "@iso:-30d",

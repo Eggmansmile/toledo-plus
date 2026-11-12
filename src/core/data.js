@@ -1477,6 +1477,18 @@
     return { title: (a && a.title) || '', body: (a && a.body) || '', created: toMs(a && a.created) };
   }
 
+  /** Assignment text + attachments of one content item (deadline detail, F6).
+   *  → {body (raw HTML — sanitize before rendering), attachments:[{id, name}]}. Never throws: missing parts come back empty. */
+  async function ultraItem(cid, id) {
+    const base = `${BB}/v1/courses/${encodeURIComponent(cid)}/contents/${encodeURIComponent(id)}`;
+    const [c, a] = await Promise.allSettled([ultra(base), ultra(`${base}/attachments`)]);
+    const item = c.status === 'fulfilled' && c.value ? c.value : {};
+    return {
+      body: String(item.body || item.description || ''),
+      attachments: a.status === 'fulfilled' ? arr(a.value).filter((x) => x && x.id).map((x) => ({ id: x.id, name: x.fileName || x.id })) : [],
+    };
+  }
+
   // ---------------------------------------------------------------- announcement bodies (sheet)
   // Small in-memory caches (per tab, never persisted: notices stay off disk). Failures are never cached.
   const BODY_TTL = 30 * 60e3, BODY_MAX = 40;
@@ -1716,7 +1728,7 @@
     markRead, markFeedSeen, markAllRead, setPinned, toggleDone, setDone, addCustomDeadline, updateCustomDeadline, removeCustomDeadline, addRecent,
     ics, icsEvents, icsName, icsReminder,
     userName, loadUser,
-    ultraCourse, ultraTree, ultraDownload, ultraOpen, ultraAnnouncement, resolveCourseId, clearCourseCache, ultraItemUrl: itemLink,
+    ultraCourse, ultraTree, ultraDownload, ultraOpen, ultraAnnouncement, ultraItem, resolveCourseId, clearCourseCache, ultraItemUrl: itemLink,
     announcementBody, annIds, advalvasMessage, advalvasUrl, advalvasId: valvasId, markUnread, VALVAS,
     // exposed for unit tests only
     _test: {
