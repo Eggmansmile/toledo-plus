@@ -7,6 +7,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ## [Unreleased]
 
 ### Added
+- Course cards list the teaching activities of a subject (college, labosessie, ...). A subject without a known semester takes it from its activities, or from the cached KU Loket timetable.
 - Firefox prototype packaging with a Firefox-specific Manifest V3 background
   configuration and `web-ext` development command (Firefox 140+, Firefox for Android 142+).
 

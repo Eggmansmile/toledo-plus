@@ -105,6 +105,7 @@
       <span class="cs-text">
         <span class="cs-name" title="${esc(c.title || name)}">${esc(name)}</span>
         <span class="cs-meta">${esc(meta)}</span>
+        ${c.activities && c.activities.length ? `<span class="cs-meta cs-acts">${esc(c.activities.join(' · '))}</span>` : ''}
         ${unavailable ? `<span class="cs-unavail">${esc(t('courses.unavailable'))}</span>` : ''}
       </span>
       <span class="cs-trail">${badge}</span>`;

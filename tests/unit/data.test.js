@@ -131,6 +131,40 @@ test('courses: 2026-27 bcourses replace the never-available per-activity courses
   eq(D.courses().find((c) => c.luId === 'ULTRA-C1-B-2627').semester, 'SEMESTER1', 'bcourse takes the semester of its officialReference course');
 });
 
+test('courses: bcourse activities and semester fallbacks (officialReference missing, KU Loket)', async () => {
+  const { TP, D } = await setup();
+  const T = TP.data._test;
+  const bc = (id, title, extra = {}) => ({ id, learningUnitId: 'B' + id, title, type: 'bcourse', semester: 'UNKNOWN', academicYear: 2627, available: true, link: '', ...extra });
+  const ac = (id, title, semester) => ({ id, learningUnitId: 'A' + id, title, type: 'course', semester, academicYear: 2627, available: false, link: '' });
+  T._put('enrollments', [
+    bc(1, 'Elektrische machines - Electrical Machines', { officialReference: 'Elektrische machines: college [T3hEM1]' }),
+    ac(2, 'Elektrische machines: college [T3hEM1]', 'SEMESTER1'),
+    ac(3, 'Elektrische machines: labosessie [T3pEM1]', 'SEMESTER1'),
+    ac(4, 'Elektrische machines: oefensessie [T3oEM1]', 'SEMESTER1'),
+    ac(5, 'Elektrische machines: college [T3hEM2]', 'SEMESTER1'), // other code, same name: matched by name
+    bc(6, 'Regeltechniek'), // no officialReference, matched by name
+    ac(7, 'Regeltechniek: college [T3hRT1]', 'SEMESTER1'),
+    ac(8, 'Regeltechniek: labosessie [T3pRT1]', 'SEMESTER2'),
+    bc(9, 'Mechanica - Mechanics'), // nothing to match: KU Loket
+    bc(10, 'Fluidica'),
+  ]);
+  const get = (lu) => D.courses().find((c) => c.luId === lu);
+  eq(get('B1').activities, ['college', 'labosessie', 'oefensessie']);
+  assert.equal(get('B1').semester, 'SEMESTER1');
+  eq(get('B6').activities, ['college', 'labosessie']);
+  assert.equal(get('B6').semester, 'YEAR', 'mixed activity semesters');
+  const at = (m, d = 10) => new Date(2026 + (m < 8 ? 1 : 0), m, d, 10).getTime();
+  const lessons = [
+    { title: 'Mechanica', courseCode: '', start: at(9) }, { title: 'Mechanica: les', courseCode: '', start: at(11) },
+    { title: 'Fluidica', courseCode: '', start: at(9) }, { title: 'Fluidica', courseCode: '', start: at(2) },
+  ];
+  TP.kuloket = { peekLessons: () => lessons };
+  assert.equal(get('B9').semester, 'SEMESTER1');
+  assert.equal(get('B10').semester, 'YEAR');
+  lessons.splice(0, 2);
+  assert.equal(get('B9').semester, 'UNKNOWN', 'no lessons: stays unknown');
+});
+
 test('courses sort: activity, name, manual order (no pinned-first)', async () => {
   const { TP, D } = await setup();
   // activity: latest non-due, non-course event (LU_B −1h, LU_A −2h)
