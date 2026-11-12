@@ -616,13 +616,47 @@
     return { unreadBy, latestBy };
   }
 
+  const nameOf = (title) => courseName(title).split(':')[0].trim().toLowerCase(); // Dutch subject name of an activity title
   function allCourses() {
     const { unreadBy, latestBy } = eventStats();
     const en = (peek('enrollments') || []).filter((e) => e && e.learningUnitId);
     // A bcourse has semester UNKNOWN; its officialReference is the title of one of its per-activity courses, which has one.
-    const semByTitle = new Map(en.filter((e) => e.type === 'course' && e.semester && e.semester !== 'UNKNOWN').map((e) => [`${e.academicYear}|${e.title}`, e.semester])); // same title can recur in other years
-    return en.map((e) => buildCourse(e.type === 'bcourse' && (!e.semester || e.semester === 'UNKNOWN') && e.officialReference && semByTitle.has(`${e.academicYear}|${e.officialReference}`)
-      ? { ...e, semester: semByTitle.get(`${e.academicYear}|${e.officialReference}`) } : e, unreadBy, latestBy));
+    const acts = en.filter((e) => e.type === 'course');
+    const actOf = (e) => (courseName(e.title).split(':')[1] || '').trim().toLowerCase();
+    const skel = (c) => (c.length > 3 ? c.slice(0, 2) + c.slice(3) : ''); // T3hEM1 / T3pEM1: the 3rd character is the activity type
+    return en.map((e) => {
+      if (e.type !== 'bcourse') return buildCourse(e, unreadBy, latestBy);
+      const ref = acts.find((a) => a.academicYear === e.academicYear && e.officialReference && a.title === e.officialReference);
+      const refSkel = ref ? skel(courseCode(ref.title)) : '';
+      const bn = courseName(e.title).split(' - ')[0].trim().toLowerCase();
+      const mine = acts.filter((a) => a.academicYear === e.academicYear && (a === ref
+        || (refSkel && skel(courseCode(a.title)) === refSkel) || (bn && nameOf(a.title) === bn)));
+      let sem = e.semester;
+      if (!sem || sem === 'UNKNOWN') {
+        const known = (ref && ref.semester && ref.semester !== 'UNKNOWN') ? [ref.semester]
+          : [...new Set(mine.map((a) => a.semester).filter((x) => x && x !== 'UNKNOWN'))];
+        if (known.length) sem = known.length === 1 ? known[0] : 'YEAR';
+        else sem = kuloketSemester(bn, mine.map((a) => courseCode(a.title)), e.academicYear) || sem;
+      }
+      return { ...buildCourse({ ...e, semester: sem }, unreadBy, latestBy), activities: [...new Set(mine.map(actOf).filter(Boolean))] };
+    });
+  }
+
+  /** Semester from the cached KU Loket timetable (no requests): lessons only Sep–Jan → SEMESTER1, only Feb–Jun → SEMESTER2, both → YEAR. */
+  function kuloketSemester(name, codes, year) {
+    try {
+      const kl = TP.kuloket;
+      const y = Math.floor((Number(year) || 0) / 100);
+      if (!kl || !kl.peekLessons || !y) return '';
+      const from = new Date(2000 + y, 8, 1).getTime(), to = new Date(2001 + y, 8, 1).getTime();
+      let s1 = false, s2 = false;
+      for (const l of kl.peekLessons({ from, to }) || []) {
+        if (!(codes.includes(l.courseCode) && l.courseCode) && !(name && nameOf(l.title) === name)) continue;
+        const m = new Date(l.start).getMonth();
+        if (m >= 8 || m === 0) s1 = true; else if (m >= 1 && m <= 5) s2 = true;
+      }
+      return s1 && s2 ? 'YEAR' : s1 ? 'SEMESTER1' : s2 ? 'SEMESTER2' : '';
+    } catch (_) { return ''; }
   }
 
   function maxYear(list) {

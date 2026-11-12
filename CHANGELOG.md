@@ -9,6 +9,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ### Added
 - Keyboard: "g then letter" opens a view: G O Overzicht, G V Vakken, G D Deadlines, G A Agenda, G M Mededelingen, G K KU Loket, G S Instellingen. Not while typing, not with ⌘/Ctrl/Alt, and in the agenda a plain G stays "ga naar datum". Listed under ? in the agenda.
 - Deadlines: the detail sheet now loads the assignment text (sanitized) and the attachments of an Ultra item and downloads them from the sheet (F6). Exam countdown ("morgen", "over 12 dagen") already existed; it now has a DST unit test.
+- Course cards list the teaching activities of a subject (college, labosessie, ...). A subject without a known semester takes it from its activities, or from the cached KU Loket timetable.
 - Firefox prototype packaging with a Firefox-specific Manifest V3 background
   configuration and `web-ext` development command (Firefox 140+, Firefox for Android 142+).
 
