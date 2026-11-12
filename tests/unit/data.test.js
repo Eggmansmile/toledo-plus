@@ -159,7 +159,7 @@ test('courses: bcourse activities and semester fallbacks (officialReference miss
     { title: 'Fluidica', courseCode: '', start: at(9) }, { title: 'Fluidica', courseCode: '', start: at(2) },
   ];
   const peeks = [];
-  TP.kuloket = { peekLessons: (o) => { peeks.push(o); return lessons; } };
+  TP.kuloket = { peekLessons: (o) => { peeks.push(o); D.courses(); return lessons; } }; // the real one calls back into courses() (matcher)
   D.courses();
   assert.ok(peeks.length === 1 && peeks[0].cacheOnly, 'one cache-only read per call: a revalidating read made every render refetch the year (blank page)');
   assert.equal(get('B9').semester, 'SEMESTER1');
