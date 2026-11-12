@@ -620,9 +620,9 @@
     const { unreadBy, latestBy } = eventStats();
     const en = (peek('enrollments') || []).filter((e) => e && e.learningUnitId);
     // A bcourse has semester UNKNOWN; its officialReference is the title of one of its per-activity courses, which has one.
-    const semByTitle = new Map(en.filter((e) => e.type === 'course' && e.semester && e.semester !== 'UNKNOWN').map((e) => [e.title, e.semester]));
-    return en.map((e) => buildCourse(e.type === 'bcourse' && (!e.semester || e.semester === 'UNKNOWN') && semByTitle.has(e.officialReference)
-      ? { ...e, semester: semByTitle.get(e.officialReference) } : e, unreadBy, latestBy));
+    const semByTitle = new Map(en.filter((e) => e.type === 'course' && e.semester && e.semester !== 'UNKNOWN').map((e) => [`${e.academicYear}|${e.title}`, e.semester])); // same title can recur in other years
+    return en.map((e) => buildCourse(e.type === 'bcourse' && (!e.semester || e.semester === 'UNKNOWN') && e.officialReference && semByTitle.has(`${e.academicYear}|${e.officialReference}`)
+      ? { ...e, semester: semByTitle.get(`${e.academicYear}|${e.officialReference}`) } : e, unreadBy, latestBy));
   }
 
   function maxYear(list) {

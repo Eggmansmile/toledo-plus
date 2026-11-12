@@ -39,7 +39,7 @@
     if (ui.scope === 'communities') ok = c.type === 'community';
     else if (ui.scope === 'archive') ok = isCourse && year < max;
     else ok = isCourse && year === max;
-    if (ok && ui.scope !== 'communities' && ui.sem !== 'all') ok = c.semester === ui.sem || c.semester === 'UNKNOWN'; // bcourses have no semester
+    if (ok && ui.scope !== 'communities' && ui.sem !== 'all') ok = c.semester === ui.sem || c.semester === 'UNKNOWN'; // no semester known (bcourse without officialReference)
     return ok;
   }
   const byName = (a, b) => String(a.name).localeCompare(String(b.name), TP.i18n.locale(), { sensitivity: 'base', numeric: true });
