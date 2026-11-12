@@ -655,7 +655,7 @@
       if (!r || !loaded) return null;
       const ws = weeksFor(r.from, r.to);
       const need = ws.filter(isStale);
-      if (need.length) scheduleRevalidate(need);
+      if (need.length && !o.cacheOnly) scheduleRevalidate(need); // cacheOnly: a pure read, never triggers fetches
       return collect(r.from, r.to);
     } catch (_) { return null; }
   }

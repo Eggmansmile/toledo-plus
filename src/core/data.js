@@ -624,6 +624,8 @@
     const acts = en.filter((e) => e.type === 'course');
     const actOf = (e) => (courseName(e.title).split(':')[1] || '').trim().toLowerCase();
     const skel = (c) => (c.length > 3 ? c.slice(0, 2) + c.slice(3) : ''); // T3hEM1 / T3pEM1: the 3rd character is the activity type
+    let lessons; // fetched once per call, only when a bcourse needs it
+    const kulSem = (n, c, y) => kuloketSemester(n, c, y, lessons || (lessons = {}));
     return en.map((e) => {
       if (e.type !== 'bcourse') return buildCourse(e, unreadBy, latestBy);
       const ref = acts.find((a) => a.academicYear === e.academicYear && e.officialReference && a.title === e.officialReference);
@@ -636,21 +638,22 @@
         const known = (ref && ref.semester && ref.semester !== 'UNKNOWN') ? [ref.semester]
           : [...new Set(mine.map((a) => a.semester).filter((x) => x && x !== 'UNKNOWN'))];
         if (known.length) sem = known.length === 1 ? known[0] : 'YEAR';
-        else sem = kuloketSemester(bn, mine.map((a) => courseCode(a.title)), e.academicYear) || sem;
+        else sem = kulSem(bn, mine.map((a) => courseCode(a.title)), e.academicYear) || sem;
       }
       return { ...buildCourse({ ...e, semester: sem }, unreadBy, latestBy), activities: [...new Set(mine.map(actOf).filter(Boolean))] };
     });
   }
 
   /** Semester from the cached KU Loket timetable (no requests): lessons only Sep–Jan → SEMESTER1, only Feb–Jun → SEMESTER2, both → YEAR. */
-  function kuloketSemester(name, codes, year) {
+  function kuloketSemester(name, codes, year, memo = {}) {
     try {
       const kl = TP.kuloket;
       const y = Math.floor((Number(year) || 0) / 100);
       if (!kl || !kl.peekLessons || !y) return '';
       const from = new Date(2000 + y, 8, 1).getTime(), to = new Date(2001 + y, 8, 1).getTime();
       let s1 = false, s2 = false;
-      for (const l of kl.peekLessons({ from, to }) || []) {
+      if (!(y in memo)) memo[y] = kl.peekLessons({ from, to, cacheOnly: true }) || [];
+      for (const l of memo[y]) {
         if (!(codes.includes(l.courseCode) && l.courseCode) && !(name && nameOf(l.title) === name)) continue;
         const m = new Date(l.start).getMonth();
         if (m >= 8 || m === 0) s1 = true; else if (m >= 1 && m <= 5) s2 = true;
