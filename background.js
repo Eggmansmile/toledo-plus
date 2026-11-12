@@ -14,7 +14,13 @@ const TP_ALLOWED = {
   'https://cloud.timeedit.net': ['GET'],                // public TimeEdit iCal feed of the student's timetable
   'https://api.toledoplus.be': ['GET', 'POST'],         // Toledo+ API (exact paths: TP_API_PATHS)
   'https://icts-p-toledo-valvas.cloud.icts.kuleuven.be': ['GET'], // Ad Valvas: the page of one school notice (TP_VALVAS_PATH)
+  // Fork-only video download (src/core/kaltura.js): LTI launch of a Kaltura item, the one POST is TP_KAF_LAUNCH.
+  'https://kaltura-kaf.edu.kuleuven.cloud': ['GET', 'POST'],
+  'https://developer.blackboard.com': ['GET'],          // redirect hop of the LTI 1.3 login (never a page we read)
+  'https://cdnapisec.kaltura.com': ['GET'],             // Kaltura playManifest: flavor list of one entry
 };
+const TP_KAF = 'https://kaltura-kaf.edu.kuleuven.cloud';
+const TP_KAF_LAUNCH = '/hosted/index/oauth2-launch';
 // Ad Valvas: only the read-only message page of one notice (server-rendered HTML); query: none or exactly "?continue".
 const TP_VALVAS = 'https://icts-p-toledo-valvas.cloud.icts.kuleuven.be';
 const TP_VALVAS_PATH = /^\/student\/messages\/\d+\/external$/;
@@ -68,6 +74,7 @@ async function tpRelay(msg) {
     const u = new URL(url);
     if (u.search || u.hash || !TP_API_PATHS.includes(`${method} ${u.pathname}`)) return { ok: false, status: 0, data: null, error: 'blocked-url' };
   }
+  if (tpOrigin(url) === TP_KAF && method === 'POST' && new URL(url).pathname !== TP_KAF_LAUNCH) return { ok: false, status: 0, data: null, error: 'blocked-url' };
   if (tpOrigin(url) === TP_VALVAS) {
     const u = new URL(url);
     if (u.hash || (u.search && u.search !== '?continue') || !TP_VALVAS_PATH.test(u.pathname)) return { ok: false, status: 0, data: null, error: 'blocked-url' };

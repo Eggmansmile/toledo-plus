@@ -182,6 +182,7 @@ async function install(ctx, fx, opts = {}) {
     return route.abort('blockedbyclient');
   });
   await require('./kuloket-mock').install(ctx, rec, opts); // KU Loket + TimeEdit (registered last → matched first)
+  await require('./kaltura-mock').install(ctx, rec); // fork-only Kaltura video chain
 
   // ---- Ad Valvas message pages (server-rendered HTML; tests/fixtures/advalvas-message.html).
   //      rec.valvas.mode: 'ok' (session) | 'login' (no session: the IdP's SAML page — served here as a 200, because Playwright

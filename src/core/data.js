@@ -1468,6 +1468,12 @@
     const node = cachedNode(cid, contentId);
     const name = fileName || (node && node.contentHandler && node.contentHandler.file && node.contentHandler.file.fileName) || (node && node.title) || '';
     let att = null;
+    const video = TP.kaltura && TP.kaltura.entryId(node); // fork-only: Kaltura lecture recording
+    if (video) {
+      if (await TP.kaltura.download(cid, contentId, video)) return true;
+      openUrl(null, itemLink(cid, contentId)); // DRM / signed out / changed platform: the old behaviour
+      return 'opened';
+    }
     try {
       att = await attachmentUrl(cid, contentId, name);
       if (!att) { openUrl(null, itemLink(cid, contentId)); return 'opened'; }

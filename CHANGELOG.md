@@ -7,6 +7,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ## [Unreleased]
 
 ### Added
+- (fork) Vakinhoud: Kaltura lecture recordings (Ultra items that open `kaltura-kaf.edu.kuleuven.cloud`) get a download button that saves the best mp4 version. It replays the item's LTI launch with your own sessions, then streams the file from the Kaltura CDN to disk. Adds three hosts (`kaltura-kaf.edu.kuleuven.cloud`, `developer.blackboard.com`, `cdnapisec.kaltura.com`), so this is not for upstream. Files keep Kaltura's file name. No mp4 (DRM) or a failed launch opens the item in Ultra.
 - Keyboard: "g then letter" opens a view: G O Overzicht, G V Vakken, G D Deadlines, G A Agenda, G M Mededelingen, G K KU Loket, G S Instellingen. Not while typing, not with ⌘/Ctrl/Alt, and in the agenda a plain G stays "ga naar datum". Listed under ? in the agenda.
 - Deadlines: the detail sheet now loads the assignment text (sanitized) and the attachments of an Ultra item and downloads them from the sheet (F6). Exam countdown ("morgen", "over 12 dagen") already existed; it now has a DST unit test.
 - Course cards list the teaching activities of a subject (college, labosessie, ...). A subject without a known semester takes it from its activities, or from the cached KU Loket timetable.

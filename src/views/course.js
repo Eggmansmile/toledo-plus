@@ -271,7 +271,7 @@
     const h = H(n);
     const fk = (opts.showPath ? 'r:' : 't:') + n.id;
 
-    if (h === 'resource/x-bb-file' || ((k === 'file' || k === 'video' || k === 'image') && !/link/.test(h))) {
+    if (h === 'resource/x-bb-file' || ((k === 'file' || k === 'video' || k === 'image') && !/link/.test(h)) || TP.kaltura?.entryId(n)) { // last: fork-only Kaltura video
       const busy = st.busy.has(n.id);
       return `
         <div class="cv-row cv-leaf" data-lq="${lq}" style="--depth:${depth}">
