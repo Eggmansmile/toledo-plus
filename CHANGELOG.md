@@ -6,6 +6,10 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 
 ## [Unreleased]
 
+### Added
+- Firefox prototype packaging with a Firefox-specific Manifest V3 background
+  configuration and `web-ext` development command (Firefox 140+, Firefox for Android 142+).
+
 ### Fixed
 - Vakken: the 2026-27 courses show up and open again. Toledo now lists one course per subject plus a never-available entry per teaching activity (college, labo, oefensessie); Toledo+ showed only those, so every card was "Nog niet beschikbaar" and some subjects appeared three times.
 - Agenda: the week grid starts at the hour the agenda picks (an hour before your first lesson, or around now) again. It was scrolled before your lessons were in and then kept the hour of an empty week.
