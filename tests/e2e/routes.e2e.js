@@ -16,6 +16,24 @@ describe('routes and history', () => {
   before(async () => { h = await launch(); page = h.page; });
   after(async () => { await h?.close(); });
 
+  it('"g then letter" jumps to a view; ignored while typing, with a modifier or after 1 s', async () => {
+    await openPortal(h, 'overview');
+    await page.keyboard.press('g'); await page.keyboard.press('d');
+    await page.waitForFunction(() => location.hash === '#/home?tplus=deadlines');
+    await page.keyboard.press('g'); await page.keyboard.press('v');
+    await page.waitForFunction(() => location.hash === '#/home?tplus=courses');
+    await page.keyboard.press('g'); await page.waitForTimeout(1200); await page.keyboard.press('o');
+    assert.equal(await hash(page), '#/home?tplus=courses', 'too slow');
+    await page.keyboard.press('g'); await page.keyboard.press('Control+o');
+    assert.equal(await hash(page), '#/home?tplus=courses', 'modifier');
+    await page.keyboard.press('Control+k');
+    await page.keyboard.type('go');
+    await page.keyboard.press('Escape');
+    assert.equal(await hash(page), '#/home?tplus=courses', 'typing');
+    await page.keyboard.press('g'); await page.keyboard.press('o');
+    await page.waitForFunction(() => /^#\/home\?tplus=overview$|^#\/home\/?$/.test(location.hash));
+  });
+
   it('TP-199/TP-202: the deadline sheet has its own history entry (Back closes it, stays on Deadlines) and a "Kopieer link"', async () => {
     await openPortal(h, 'overview');
     await page.locator(S.navLink('deadlines')).click();

@@ -7,6 +7,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ## [Unreleased]
 
 ### Added
+- Keyboard: "g then letter" opens a view: G O Overzicht, G V Vakken, G D Deadlines, G A Agenda, G M Mededelingen, G K KU Loket, G S Instellingen. Not while typing, not with ⌘/Ctrl/Alt, and in the agenda a plain G stays "ga naar datum". Listed under ? in the agenda.
 - Firefox prototype packaging with a Firefox-specific Manifest V3 background
   configuration and `web-ext` development command (Firefox 140+, Firefox for Android 142+).
 

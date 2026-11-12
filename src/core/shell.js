@@ -1620,6 +1620,8 @@ ${item(`${icon('logout')}<span class="tp-menu-label">${esc(t('shell.logout'))}</
     return el.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
   }
 
+  const GO = { o: 'overview', v: 'courses', d: 'deadlines', a: 'agenda', m: 'announcements', k: 'kuloket', s: 'settings' };
+  let goAt = 0;
   // Global shortcuts (only while the shell is visible).
   function onWindowKey(ev) {
     if (mode !== 'shell' || !app) return;
@@ -1632,6 +1634,13 @@ ${item(`${icon('logout')}<span class="tp-menu-label">${esc(t('shell.logout'))}</
     if (ev.key === 'Escape') {
       if (closeMenu(true)) { ev.preventDefault(); return; }
       if (app.classList.contains('sb-open')) { ev.preventDefault(); setOverlay(false); $('.tp-sb-toggle')?.focus(); }
+    }
+    // "g then letter" jumps to a view (within 1 s). The agenda keeps a plain G for "ga naar datum", so the prefix is off there.
+    if (!mod && !ev.altKey && !ev.shiftKey && !ev.repeat && !isEditable(target) && !$('.tp-detail')?.open) {
+      const k = String(ev.key).toLowerCase();
+      if (goAt && Date.now() - goAt < 1000 && GO[k]) { goAt = 0; ev.preventDefault(); navigate(GO[k]); return; }
+      goAt = k === 'g' && current?.route !== 'agenda' ? Date.now() : 0;
+      if (goAt) { ev.preventDefault(); return; }
     }
     // View shortcuts (agenda: t/d/w/m/a/j/k/g/?…) anywhere in the app — never while typing or with ⌘/Ctrl/Alt.
     if (!mod && !ev.altKey && !ev.defaultPrevented && !isEditable(target) && !$('.tp-detail')?.open && current?.view?.onKey) {
