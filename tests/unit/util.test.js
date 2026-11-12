@@ -110,3 +110,16 @@ test('i18n: unknown navigator language defaults to nl', () => {
   const s = boot({ language: 'de-DE' });
   assert.equal(s.TP.i18n.lang(), 'nl');
 });
+
+test('exam countdown (fmt.rel): vandaag / morgen / over N dagen, also across the DST days', () => {
+  const at = (y, m, d, h = 12, min = 0) => new Date(y, m - 1, d, h, min).getTime();
+  const { TP } = boot({ now: at(2026, 10, 24, 23, 30) }); // DST ends the night after (25-hour day)
+  assert.equal(TP.fmt.rel(at(2026, 10, 24, 23, 59)), 'vandaag');
+  assert.equal(TP.fmt.rel(at(2026, 10, 25, 0, 5)), 'morgen', '35 min later, but tomorrow');
+  assert.equal(TP.fmt.rel(at(2026, 10, 26, 9)), 'over 2 dagen', 'across the 25-hour day');
+  assert.equal(TP.fmt.rel(at(2026, 11, 5, 9)), 'over 12 dagen');
+  assert.equal(TP.fmt.rel(at(2026, 10, 23, 9)), 'gisteren');
+  const spring = boot({ now: at(2027, 3, 27, 12) }).TP; // DST starts the night after (23-hour day)
+  assert.equal(spring.fmt.rel(at(2027, 3, 28, 23, 0)), 'morgen');
+  assert.equal(spring.fmt.rel(at(2027, 3, 29, 0, 30)), 'over 2 dagen');
+});

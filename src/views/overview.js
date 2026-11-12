@@ -445,7 +445,7 @@
     openDeadline(d, opener, root) {
       if (!d || !TP.shell.detail) return;
       const { cid, id } = VA.itemIds(d.url);
-      const st = { body: null, loading: false, edit: false, err: '' };
+      const st = { body: null, atts: [], loading: false, edit: false, err: '' };
       const metaRow = (ic, label, value) => TP.ui.row({ leading: `<span class="tp-tile">${icon(ic, { size: 16 })}</span>`, title: value, subtitle: esc(label) });
       const btn = (action, ic, label) => `<button type="button" class="tp-row has-lead" data-detail-action="${esc(action)}"><span class="tp-row-lead"><span class="tp-tile">${icon(ic, { size: 16 })}</span></span><span class="tp-row-main"><span class="tp-row-title">${esc(label)}</span></span></button>`;
       const own = d.source === 'custom' && d.customId != null;
@@ -469,6 +469,8 @@
         let desc = '';
         if (st.loading) desc = TP.ui.group(`<p class="tp-detail-desc va-muted">${esc(t('common.loading'))}</p>`);
         else if (st.body) desc = TP.ui.group(`<div class="tp-detail-desc tp-prose">${TP.util.sanitize(st.body)}</div>`);
+        const attRows = st.atts.map((a, i) => btn('att:' + i, 'download', a.name)).join('');
+        const attHtml = attRows ? `<section aria-label="${esc(t('va.sheet.attachments'))}">${TP.ui.group(attRows)}</section>` : '';
         const actions = [
           d.courseLuId || cid ? btn('course', 'courses', t('va.sheet.openCourse')) : '',
           d.url ? `<a class="tp-row has-lead" href="${esc(TP.util.abs(d.url))}" target="_blank" rel="noopener"><span class="tp-row-lead"><span class="tp-tile">${icon('external', { size: 16 })}</span></span><span class="tp-row-main"><span class="tp-row-title">${esc(t('va.openToledo'))}</span></span><span class="va-sr">${esc(t('va.newTab'))}</span></a>` : '',
@@ -477,7 +479,7 @@
           own ? btn('edit', 'page', t('deadlines.edit')) : '',
           own ? btn('remove', 'trash', t('deadlines.remove')) : '',
         ].filter(Boolean).join('');
-        return `${TP.ui.group(meta, { cls: 'tp-detail-meta' })}${desc}${TP.ui.group(actions, { cls: 'tp-detail-actions' })}`
+        return `${TP.ui.group(meta, { cls: 'tp-detail-meta' })}${desc}${attHtml}${TP.ui.group(actions, { cls: 'tp-detail-actions' })}`
           + `<p class="va-foot">${esc(t('deadlines.honest'))}</p>`;
       };
       const sheet = () => (TP.shell.app && TP.shell.app.querySelector('.tp-detail')) || null;
@@ -518,6 +520,11 @@
         async onAction(action) {
           if (action === 'course') { TP.shell.detail.close(); await VA.openInCourse(d); return; }
           if (action === 'ics') { VA.icsOne(d, root); return; }
+          if (action.startsWith('att:') && st.atts[+action.slice(4)]) {
+            const r = await TP.data.ultraDownload(cid, id, st.atts[+action.slice(4)].name).catch(() => false);
+            if (r === false) VA.toast(t('course.downloadFailed'));
+            return;
+          }
           if (action === 'done') {
             await TP.data.toggleDone(d.key);
             d.done = !d.done;
@@ -537,8 +544,9 @@
         st.loading = true;
         TP.shell.detail.update(html());
         Promise.resolve().then(getter).then((n) => {
-          st.body = n && (n.body || n.description) ? String(n.body || n.description) : null;
-        }).catch(() => { st.body = null; }).finally(() => {
+          st.body = n && n.body ? String(n.body) : null;
+          st.atts = (n && n.attachments) || [];
+        }).catch(() => { st.body = null; st.atts = []; }).finally(() => {
           st.loading = false;
           if (TP.shell.detail.isOpen() && !st.edit) TP.shell.detail.update(html()); // never under a half-typed edit
         });

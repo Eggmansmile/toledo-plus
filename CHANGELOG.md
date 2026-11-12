@@ -7,6 +7,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ## [Unreleased]
 
 ### Added
+- Deadlines: the detail sheet now loads the assignment text (sanitized) and the attachments of an Ultra item and downloads them from the sheet (F6). Exam countdown ("morgen", "over 12 dagen") already existed; it now has a DST unit test.
 - Firefox prototype packaging with a Firefox-specific Manifest V3 background
   configuration and `web-ext` development command (Firefox 140+, Firefox for Android 142+).
 
