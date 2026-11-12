@@ -118,7 +118,7 @@ test('courses: 2026-27 bcourses replace the never-available per-activity courses
   const { TP, D } = await setup();
   const T = TP.data._test;
   T._put('enrollments', [
-    { id: 21, learningUnitId: 'ULTRA-C1-B-2627', title: 'Data-acquisitie - Data Acquisition', type: 'bcourse', semester: 'UNKNOWN', academicYear: 2627, available: true, link: 'https://x/b1' },
+    { id: 21, learningUnitId: 'ULTRA-C1-B-2627', title: 'Data-acquisitie - Data Acquisition', officialReference: 'Data-acquisitie [T2hDA1]', type: 'bcourse', semester: 'UNKNOWN', academicYear: 2627, available: true, link: 'https://x/b1' },
     { id: 22, learningUnitId: 'ULTRA-B-KUL-T2hDA1-2627', title: 'Data-acquisitie [T2hDA1]', type: 'course', semester: 'SEMESTER1', academicYear: 2627, available: false, link: 'https://x/c1' },
     { id: 23, learningUnitId: 'ULTRA-B-KUL-T2hWT2-2627', title: 'Thermal Technologies [T2hWT2]', type: 'course', semester: 'SEMESTER2', academicYear: 2627, available: true, link: 'https://x/c2' },
     { id: 24, learningUnitId: 'ULTRA-B-KUL-OLD-2526', title: 'Oud [OLD]', type: 'course', semester: 'SEMESTER1', academicYear: 2526, available: false, link: '' },
@@ -127,6 +127,7 @@ test('courses: 2026-27 bcourses replace the never-available per-activity courses
   eq(D.courses().map((c) => c.luId).sort(), ['ULTRA-B-KUL-T2hWT2-2627', 'ULTRA-C1-B-2627'], 'bcourse + available course; the unavailable duplicate is gone');
   eq(D.courses({ currentOnly: false }).map((c) => c.luId).sort(), ['ULTRA-B-KUL-OLD-2526', 'ULTRA-B-KUL-T2hWT2-2627', 'ULTRA-C1-B-2627'], 'older years without bcourses keep their courses');
   assert.equal(D.courses({ includeCommunities: true }).at(-1).type, 'community', 'communities last');
+  eq(D.courses().find((c) => c.luId === 'ULTRA-C1-B-2627').semester, 'SEMESTER1', 'bcourse takes the semester of its officialReference course');
 });
 
 test('courses sort: activity, name, manual order (no pinned-first)', async () => {

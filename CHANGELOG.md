@@ -13,6 +13,7 @@ Het formaat volgt [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) en he
 ### Fixed
 - Vakken: the 2026-27 courses show up and open again. Toledo now lists one course per subject plus a never-available entry per teaching activity (college, labo, oefensessie); Toledo+ showed only those, so every card was "Nog niet beschikbaar" and some subjects appeared three times.
 - Agenda: the week grid starts at the hour the agenda picks (an hour before your first lesson, or around now) again. It was scrolled before your lessons were in and then kept the hour of an empty week.
+- Vakken: the semester filter works for the 2026-27 courses again. A course takes the semester of its first teaching activity; only a course without one stays under every semester.
 - toledoplus.be showed the version in development (1.7) while the Download button handed out the latest release (1.6). The site now names the released version, and a new release updates it.
 
 ### Changed

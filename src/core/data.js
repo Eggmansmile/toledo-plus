@@ -618,7 +618,11 @@
 
   function allCourses() {
     const { unreadBy, latestBy } = eventStats();
-    return (peek('enrollments') || []).filter((e) => e && e.learningUnitId).map((e) => buildCourse(e, unreadBy, latestBy));
+    const en = (peek('enrollments') || []).filter((e) => e && e.learningUnitId);
+    // A bcourse has semester UNKNOWN; its officialReference is the title of one of its per-activity courses, which has one.
+    const semByTitle = new Map(en.filter((e) => e.type === 'course' && e.semester && e.semester !== 'UNKNOWN').map((e) => [e.title, e.semester]));
+    return en.map((e) => buildCourse(e.type === 'bcourse' && (!e.semester || e.semester === 'UNKNOWN') && semByTitle.has(e.officialReference)
+      ? { ...e, semester: semByTitle.get(e.officialReference) } : e, unreadBy, latestBy));
   }
 
   function maxYear(list) {
