@@ -30,16 +30,16 @@
     return TP.data.courses({ includeHidden: true, includeCommunities: true, currentOnly: false }) || [];
   }
   function maxYear(list) {
-    return list.filter((c) => c.type === 'course').reduce((m, c) => Math.max(m, Number(c.year) || 0), 0);
+    return list.filter((c) => c.type !== 'community').reduce((m, c) => Math.max(m, Number(c.year) || 0), 0);
   }
   function inFilter(c, max) {
-    const isCourse = c.type === 'course';
+    const isCourse = c.type !== 'community'; // 'course' or 'bcourse'
     const year = Number(c.year) || 0;
     let ok;
     if (ui.scope === 'communities') ok = c.type === 'community';
     else if (ui.scope === 'archive') ok = isCourse && year < max;
     else ok = isCourse && year === max;
-    if (ok && ui.scope !== 'communities' && ui.sem !== 'all') ok = c.semester === ui.sem;
+    if (ok && ui.scope !== 'communities' && ui.sem !== 'all') ok = c.semester === ui.sem || c.semester === 'UNKNOWN'; // bcourses have no semester
     return ok;
   }
   const byName = (a, b) => String(a.name).localeCompare(String(b.name), TP.i18n.locale(), { sensitivity: 'base', numeric: true });

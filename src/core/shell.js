@@ -519,7 +519,7 @@
       cmp = (a, b) => p(a) - p(b) || byName(a, b);
     } else if (cs.sort === 'name') cmp = byName;
     else cmp = (a, b) => (b.latest || 0) - (a.latest || 0) || byName(a, b);
-    return list.slice().sort((a, b) => (a.type === b.type ? 0 : a.type === 'course' ? -1 : 1) || cmp(a, b));
+    return list.slice().sort((a, b) => ((a.type === 'community') - (b.type === 'community')) || cmp(a, b));
   }
 
   /** The courses the student put in the sidebar (settings.courses.items[luId].inSidebar, v1.5), in the

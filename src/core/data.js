@@ -622,7 +622,7 @@
   }
 
   function maxYear(list) {
-    return Math.max(0, ...list.filter((c) => c.type === 'course').map((c) => c.year || 0));
+    return Math.max(0, ...list.filter((c) => c.type === 'course' || c.type === 'bcourse').map((c) => c.year || 0));
   }
 
   /**
@@ -638,9 +638,13 @@
     const currentOnly = opts.currentOnly != null ? !!opts.currentOnly : true;
     const all = allCourses();
     const year = maxYear(all);
+    // Since 2026-27 Toledo lists a 'bcourse' (the Ultra course you open) next to one never-available 'course' per
+    // teaching activity (college, labo, …): those are duplicates you can't open, so drop them in a year that has bcourses.
+    const bYears = new Set(all.filter((c) => c.type === 'bcourse').map((c) => c.year));
     const list = all.filter((c) => {
       if (!includeHidden && c.hidden) return false;
       if (c.type === 'community') return includeCommunities;
+      if (c.type === 'course' && !c.available && bYears.has(c.year)) return false;
       if (currentOnly && c.year !== year) return false;
       return true;
     });
@@ -652,7 +656,7 @@
       const pos = (c) => { const i = order.indexOf(c.luId); return i < 0 ? 1e9 : i; };
       cmp = (a, b) => pos(a) - pos(b) || byName(a, b);
     } else cmp = (a, b) => (b.latest - a.latest) || byName(a, b);
-    return list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'course' ? -1 : 1) || cmp(a, b));
+    return list.sort((a, b) => ((a.type === 'community') - (b.type === 'community')) || cmp(a, b));
   }
 
   function course(luId) {
