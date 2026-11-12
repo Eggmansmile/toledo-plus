@@ -114,6 +114,21 @@ test('courses: current year only, communities/hidden excluded, nickname + colors
   assert.equal(D.courses({ includeHidden: true }).length, 2);
 });
 
+test('courses: 2026-27 bcourses replace the never-available per-activity courses of that year', async () => {
+  const { TP, D } = await setup();
+  const T = TP.data._test;
+  T._put('enrollments', [
+    { id: 21, learningUnitId: 'ULTRA-C1-B-2627', title: 'Data-acquisitie - Data Acquisition', type: 'bcourse', semester: 'UNKNOWN', academicYear: 2627, available: true, link: 'https://x/b1' },
+    { id: 22, learningUnitId: 'ULTRA-B-KUL-T2hDA1-2627', title: 'Data-acquisitie [T2hDA1]', type: 'course', semester: 'SEMESTER1', academicYear: 2627, available: false, link: 'https://x/c1' },
+    { id: 23, learningUnitId: 'ULTRA-B-KUL-T2hWT2-2627', title: 'Thermal Technologies [T2hWT2]', type: 'course', semester: 'SEMESTER2', academicYear: 2627, available: true, link: 'https://x/c2' },
+    { id: 24, learningUnitId: 'ULTRA-B-KUL-OLD-2526', title: 'Oud [OLD]', type: 'course', semester: 'SEMESTER1', academicYear: 2526, available: false, link: '' },
+    { id: 25, learningUnitId: 'COMM-1', title: 'Studentenraad', type: 'community', semester: 'UNKNOWN', academicYear: 0, available: true, link: '' },
+  ]);
+  eq(D.courses().map((c) => c.luId).sort(), ['ULTRA-B-KUL-T2hWT2-2627', 'ULTRA-C1-B-2627'], 'bcourse + available course; the unavailable duplicate is gone');
+  eq(D.courses({ currentOnly: false }).map((c) => c.luId).sort(), ['ULTRA-B-KUL-OLD-2526', 'ULTRA-B-KUL-T2hWT2-2627', 'ULTRA-C1-B-2627'], 'older years without bcourses keep their courses');
+  assert.equal(D.courses({ includeCommunities: true }).at(-1).type, 'community', 'communities last');
+});
+
 test('courses sort: activity, name, manual order (no pinned-first)', async () => {
   const { TP, D } = await setup();
   // activity: latest non-due, non-course event (LU_B −1h, LU_A −2h)
