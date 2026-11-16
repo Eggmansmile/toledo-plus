@@ -25,8 +25,11 @@ describe('privacy', () => {
   });
 
   it('a file that is not a Toledo+ export is refused and changes nothing', async () => {
+    await openPortal(h, 'settings');
     const before = await h.getSettings();
-    await page.locator('#tplus-root input[name="st-import"]').setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{"hello":"world","appearance":"dark"}') });
+    const input = page.locator('#tplus-root input[name="st-import"]');
+    await input.waitFor({ state: 'attached' });
+    await input.setInputFiles({ name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{"hello":"world","appearance":"dark"}') });
     await page.waitForFunction((txt) => document.querySelector('#tplus-root').shadowRoot.querySelector('.tp-toasts')?.textContent.includes(txt), nl['settings.data.importForeign']);
     const after = await h.getSettings();
     assert.equal(after.appearance, before.appearance);

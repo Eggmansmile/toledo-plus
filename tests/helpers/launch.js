@@ -40,8 +40,9 @@ const IGNORED_ERRORS = [
 async function launch(o = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tplus-e2e-'));
   const files = await filesServer.start();
+  const executablePath = process.env.CHROMIUM_BIN || (process.env.CI ? undefined : (fs.existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined));
   const ctx = await chromium.launchPersistentContext(userDataDir, {
-    channel: 'chromium', // "new" headless – required for extensions
+    ...(executablePath ? { executablePath } : { channel: 'chromium' }), // "new" headless – required for extensions
     headless: HEADLESS,
     args: [`--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`, '--no-first-run', '--no-default-browser-check', ...(files ? files.chromeArgs : [])],
     ignoreHTTPSErrors: !!files,
